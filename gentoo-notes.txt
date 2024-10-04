@@ -1,0 +1,6 @@
+gentoo notes
+installation
+installing tools
+$ emerge --ask app-admin/sysklogd sys-process/cronie sys-apps/mlocate app-shells/bash-completion net-misc/chrony sys-fs/xfsprogs
+net-misc/networkmanager app-admin/sudo sys-boot/grub
+$ rc-update add sysklogd default && rc-update add cronie default && rc-update add sshd default && rc-update add elogind boot && rc-update add dbus boot && rc-update add chronyd default && rc-update add NetworkManager default
