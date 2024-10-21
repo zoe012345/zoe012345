@@ -16,7 +16,7 @@ FCFLAGS="${COMMON_FLAGS}"
 FFLAGS="${COMMON_FLAGS}"
 LC_MESSAGES=C.utf8
 MAKEOPTS="-j3 -l4"
-USE="-systemd”
+USE="-systemd"
 VIDEO_CARDS="intel"
 $ cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 $ arch-chroot /mnt/gentoo
