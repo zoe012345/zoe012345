@@ -1,1 +1,95 @@
 
+gentoo linux notes
+disks
+$ mkfs.xfs -f /dev/sda3
+$ mkfs.vfat -F 32 /dev/sda1
+$ mkswap /dev/sda2
+$ swapon /dev/sda2
+$ mkdir --parents /mnt/gentoo
+$ mkdir --parents /mnt/gentoo/efi
+$ mount /dev/sda3 /mnt/gentoo
+$ cd /mnt/gentoo
+$ chronyd -q
+$ wget "stage-3-link"
+$ tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
+$ vim /mnt/gentoo/etc/portage/make.conf
+make configuration file
+file starts
+COMMON_FLAGS="-march=skylake -O2 -pipe"
+CFLAGS="${COMMON_FLAGS}"
+CXXFLAGS="${COMMON_FLAGS}"
+FCFLAGS="${COMMON_FLAGS}"
+FFLAGS="${COMMON_FLAGS}"
+LC_MESSAGES=C.utf8
+MAKEOPTS="-j3 -l4"
+USE="-a52 -bluetooth -branding -cdda -cdr -cups -dvd -dvdr -kde -kf6compat -kwallet -plasma -qt5 -qt6 -semantic-desktop”
+VIDEO_CARDS="intel"
+FEATURES="${FEATURES} getbinpkg"
+FEATURES="${FEATURES} binpkg-request-signature"
+GENTOO_MIRRORS="https://mirror.aarnet.edu.au/pub/gentoo/ \
+	http://mirror.aarnet.edu.au/pub/gentoo/ \
+	rsync://mirror.aarnet.edu.au/pub/gentoo/ \
+	ftp://ftp.swin.edu.au/gentoo \
+	http://ftp.swin.edu.au/gentoo"
+file ends
+chroot
+$ cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
+$ arch-chroot /mnt/gentoo
+$ mkdir /efi
+$ mount /dev/sda1 /efi
+portage setup
+$ emerge-webrsync
+$ emerge --ask --verbose --oneshot app-portage/mirrorselect
+$ mirrorselect -i -o >> /etc/portage/make.conf
+profile
+$ eselect profile list
+$ eselect profile set
+binpkg
+$ nano /etc/portage/binrepos.conf/gentoobinhost.conf
+-- change priority to 9999
+$ getuto
+cpuflags
+$ emerge --ask --oneshot app-portage/cpuid2cpuflags
+$ echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
+updating world set
+$ emerge --ask --verbose --update --deep --newuse --getbinpkg @world
+timezone
+$ ln -sf ../usr/share/zoneinfo/Pacific/Auckland /etc/localtime
+locale
+$ nano /etc/locale.gen
+$ locale-gen
+$ eselect locale list
+$ eselect locale set 2
+$ env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
+kernel install
+$ nano /etc/portage/package.use/installkernel
+-- add "sys-kernel/installkernel dracut"
+$ emerge –ask –autounmask linux-firmware intel-microcode gentoo-kernel-bin
+configuring the system
+fstab
+file starts
+/dev/sda1   /efi    	vfat	umask=0077 	0 2
+/dev/sda2   none     	swap	sw               	0 0
+/dev/sda3   /        	xfs	defaults,noatime          	0 1
+file ends
+$ echo gentoo > /etc/hostname
+$ passwd
+grub pre-install tasks
+$ nano /etc/portage/package.use/installkernel
+-- add "grub"
+$ echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
+install tools
+$ emerge --ask app-admin/sysklogd sys-process/cronie sys-apps/mlocate app-shells/bash-completion net-misc/chrony sys-fs/xfsprogs net-misc/networkmanager app-admin/sudo sys-boot/grub xorg-server alacritty neovim
+setting up services
+$ rc-update add sysklogd default && rc-update add cronie default && rc-update add sshd default && rc-update add elogind boot && rc-update add dbus boot && rc-update add chronyd default && rc-update add NetworkManager default
+user
+$ useradd zoe ; usermod -aG wheel,audio,video,plugdev zoe
+$ passwd zoe
+$ nano /etc/sudoers
+bootloader
+$ grub-install --efi-directory=/efi
+$ grub-mkconfig -o /boot/grub/grub.cfg
+exiting installation
+$ exit
+$ cd
+$ umount -R /mnt/gentoo
