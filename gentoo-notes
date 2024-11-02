@@ -93,3 +93,24 @@ exiting installation
 $ exit
 $ cd
 $ umount -R /mnt/gentoo
+
+xfce-extra/xfce4-pulseaudio-plugin
+xfce-base/tumbler
+xfce-base/thunar					
+xfce-base/thunar-volman					
+xfce-base/tumbler
+xfce-base/xfce4-appfinder	
+xfce-base/xfce4-exo
+x11-misc/gigolo									
+x11-themes/hicolor-icon-theme
+virtual/freedesktop-icon-theme
+app-editors/mousepad					
+app-office/orage					
+dev-util/catfish					
+gnome-base/librsvg					
+media-fonts/dejavu					
+media-gfx/ristretto					
+media-sound/xfmpc					
+media-video/parole
+app-arch/xarchiver					
+app-cdr/xfburn
